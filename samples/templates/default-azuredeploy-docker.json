@@ -26,15 +26,7 @@
         },
         "appServicePlanSku": {
             "type": "string",
-            "allowedValues": [
-                "B3",
-                "S1",
-                "S2",
-                "S3",
-                "P1",
-                "P2",
-                "P3"
-            ],
+            "allowedValues": ["B3", "S1", "S2", "S3", "P1", "P2", "P3"],
             "defaultValue": "S2"
         },
         "numberOfInstances": {
@@ -88,8 +80,7 @@
         },
         "additionalFhirServerConfigProperties": {
             "type": "object",
-            "defaultValue": {
-            },
+            "defaultValue": {},
             "metadata": {
                 "description": "Additional configuration properties for the FHIR server. In the form {\"path1\":\"value1\",\"path2\":\"value2\"}"
             }
@@ -97,10 +88,7 @@
         "solutionType": {
             "type": "string",
             "defaultValue": "FhirServerCosmosDB",
-            "allowedValues": [
-                "FhirServerCosmosDB",
-                "FhirServerSqlServer"
-            ],
+            "allowedValues": ["FhirServerCosmosDB", "FhirServerSqlServer"],
             "metadata": {
                 "description": "The type of the solution"
             }
@@ -116,10 +104,7 @@
         },
         "cosmosDbFreeTier": {
             "type": "string",
-            "allowedValues": [
-                "Yes",
-                "No"
-            ],
+            "allowedValues": ["Yes", "No"],
             "defaultValue": "No",
             "metadata": {
                 "description": "Use Cosmos DB free tier."
@@ -162,7 +147,7 @@
         },
         "sqlSchemaAutomaticUpdatesEnabled": {
             "type": "string",
-            "allowedValues": [ "auto", "tool" ],
+            "allowedValues": ["auto", "tool"],
             "defaultValue": "[if(equals(parameters('solutionType'),'FhirServerCosmosDB'), 'tool', '')]",
             "metadata": {
                 "description": "Determine whether the sql schema should be automatically upgraded on server startup. If set to 'tool', sql schema will not be initialized or upgraded on the server startup. The schema migration tool will be required to perform initialize or upgrade. If set to 'auto', sql schema will be upgraded to the maximum supported version."
@@ -170,21 +155,13 @@
         },
         "sqlDatabaseComputeTier": {
             "type": "string",
-            "allowedValues": [
-                "Hyperscale",
-                "Standard"
-            ],
+            "allowedValues": ["Hyperscale", "Standard"],
             "defaultValue": "Hyperscale"
         },
         "fhirVersion": {
             "type": "string",
             "defaultValue": "R4",
-            "allowedValues": [
-                "Stu3",
-                "R4",
-                "R4B",
-                "R5"
-            ],
+            "allowedValues": ["Stu3", "R4", "R4B", "R5"],
             "metadata": {
                 "description": "Version of the FHIR specification to deploy."
             }
@@ -381,22 +358,18 @@
                     "type": "basicPublishingCredentialsPolicies",
                     "kind": "string",
                     "location": "[resourceGroup().location]",
-                    "dependsOn":[
-                        "[variables('serviceName')]"
-                    ],
+                    "dependsOn": ["[variables('serviceName')]"],
                     "properties": {
                         "allow": false
                     }
                 },
-                                {
+                {
                     "apiVersion": "2020-12-01",
                     "name": "ftp",
                     "type": "basicPublishingCredentialsPolicies",
                     "kind": "string",
                     "location": "[resourceGroup().location]",
-                    "dependsOn":[
-                        "[variables('serviceName')]"
-                    ],
+                    "dependsOn": ["[variables('serviceName')]"],
                     "properties": {
                         "allow": false
                     }
@@ -460,9 +433,7 @@
                 {
                     "condition": "[equals(parameters('solutionType'),'FhirServerSqlServer')]",
                     "apiVersion": "2017-10-01-preview",
-                    "dependsOn": [
-                        "[variables('sqlServerDerivedName')]"
-                    ],
+                    "dependsOn": ["[variables('sqlServerDerivedName')]"],
                     "location": "[parameters('sqlLocation')]",
                     "tags": {
                         "FhirServerSolution": "[parameters('solutionType')]"
@@ -482,9 +453,7 @@
                 {
                     "condition": "[equals(parameters('solutionType'),'FhirServerSqlServer')]",
                     "apiVersion": "2014-04-01",
-                    "dependsOn": [
-                        "[variables('sqlServerDerivedName')]"
-                    ],
+                    "dependsOn": ["[variables('sqlServerDerivedName')]"],
                     "location": "[resourceGroup().location]",
                     "name": "AllowAllWindowsAzureIps",
                     "properties": {
@@ -514,20 +483,14 @@
                         "tenantId": "[reference(variables('appServiceResourceId'), '2015-08-01', 'Full').Identity.tenantId]",
                         "objectId": "[reference(variables('appServiceResourceId'), '2015-08-01', 'Full').Identity.principalId]",
                         "permissions": {
-                            "secrets": [
-                                "get",
-                                "list",
-                                "set"
-                            ]
+                            "secrets": ["get", "list", "set"]
                         }
                     }
                 ],
                 "enableRbacAuthorization": true,
                 "enabledForDeployment": false
             },
-            "dependsOn": [
-                "[variables('appServiceResourceId')]"
-            ]
+            "dependsOn": ["[variables('appServiceResourceId')]"]
         },
         {
             "type": "Microsoft.KeyVault/vaults/providers/roleAssignments",
@@ -537,11 +500,11 @@
                 "[resourceId('Microsoft.KeyVault/vaults', variables('serviceName'))]"
             ],
             "properties": {
-                "roleDefinitionId": "[concat(subscription().Id, '/providers/Microsoft.Authorization/roleDefinitions/', 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')]", // Role definition ID for "Key Vault Secrets Officer"
+                "roleDefinitionId": "[concat(subscription().Id, '/providers/Microsoft.Authorization/roleDefinitions/', 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')]",
                 "principalId": "[reference(variables('appServiceResourceId'), '2015-08-01', 'Full').Identity.principalId]"
             }
         },
-                {
+        {
             "type": "Microsoft.KeyVault/vaults/providers/roleAssignments",
             "apiVersion": "2022-04-01",
             "name": "[concat(variables('serviceName'), '/Microsoft.Authorization/', guid(uniqueString('Reader', parameters('fhirVersion'), variables('serviceName'))))]",
@@ -549,7 +512,7 @@
                 "[resourceId('Microsoft.KeyVault/vaults', variables('serviceName'))]"
             ],
             "properties": {
-                "roleDefinitionId": "[concat(subscription().Id, '/providers/Microsoft.Authorization/roleDefinitions/', 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')]", // Role definition ID for "Key Vault Secrets Officer"
+                "roleDefinitionId": "[concat(subscription().Id, '/providers/Microsoft.Authorization/roleDefinitions/', 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')]",
                 "principalId": "b542f965-4eec-4682-8999-78dd501df864"
             }
         },
